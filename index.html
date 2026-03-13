@@ -107,7 +107,7 @@
         
         let currentTripId = null;
 
-        async function startTrip() {
+        async function  {startTrip() {
             const btn = document.querySelector('button');
             const data = {
                 action: "START",
@@ -147,7 +147,7 @@
             }
         }
 
-        function showEndPanel(data) {
+        function showEndPanel(data)
             document.getElementById('startPanel').classList.add('hidden');
             document.getElementById('endPanel').classList.remove('hidden');
             document.getElementById('tripInfo').innerText = `${data.vehicle} | Driver: ${data.driver}`;
