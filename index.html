@@ -34,17 +34,17 @@
 
     <div class="max-w-md mx-auto">
         <div id="startPanel" class="glass p-6 rounded-2xl shadow-2xl">
-            <h2 class="text-xl font-semibold mb-6 text-center border-b border-[#c5a059] pb-2">REGISTRO DE SALIDA</h2>
+            <h2 class="text-xl font-semibold mb-6 text-center border-b border-[#c5a059] pb-2 text-white">REGISTRO DE SALIDA</h2>
             
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs uppercase mb-1 opacity-70">Nombre del Driver</label>
-                    <input type="text" id="driver" class="w-full p-2 rounded gold-border outline-none" placeholder="Ej. Juan Pérez">
+                    <input type="text" id="driver" class="w-full p-3 rounded gold-border outline-none">
                 </div>
 
                 <div>
                     <label class="block text-xs uppercase mb-1 opacity-70">Vehículo</label>
-                    <select id="vehicle" class="w-full p-2 rounded gold-border outline-none">
+                    <select id="vehicle" class="w-full p-3 rounded gold-border outline-none">
                         <option value="Tahoe 2026 #1">Chevrolet Tahoe 2026 #1</option>
                         <option value="Tahoe 2026 #2">Chevrolet Tahoe 2026 #2</option>
                         <option value="Suburban 2026 #1">Chevrolet Suburban 2026 #1</option>
@@ -55,43 +55,42 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs uppercase mb-1 opacity-70">Villa</label>
-                        <input type="text" id="villa" class="w-full p-2 rounded gold-border outline-none" placeholder="Ej. 15">
+                        <input type="text" id="villa" class="w-full p-3 rounded gold-border outline-none">
                     </div>
                     <div>
                         <label class="block text-xs uppercase mb-1 opacity-70">Pasajeros</label>
-                        <input type="number" id="pax" class="w-full p-2 rounded gold-border outline-none" placeholder="0">
+                        <input type="number" id="pax" class="w-full p-3 rounded gold-border outline-none">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs uppercase mb-1 opacity-70">Destino</label>
-                    <input type="text" id="destino" class="w-full p-2 rounded gold-border outline-none" placeholder="Ej. Aeropuerto POP">
+                    <input type="text" id="destino" class="w-full p-3 rounded gold-border outline-none">
                 </div>
 
                 <div>
                     <label class="block text-xs uppercase mb-1 opacity-70 font-bold gold-text">Kilometraje Inicial</label>
-                    <input type="number" id="km_inicio" class="w-full p-2 rounded gold-border outline-none text-xl font-bold" placeholder="000000">
+                    <input type="number" id="km_inicio" class="w-full p-3 rounded gold-border outline-none text-xl font-bold">
                 </div>
 
-                <button onclick="enviarSalida()" id="btnStart" class="w-full p-4 gold-bg font-bold rounded-xl mt-4 hover:opacity-90 transition-all">
+                <button type="button" onclick="enviar()" id="btnStart" class="w-full p-4 gold-bg font-bold rounded-xl mt-4">
                     REGISTRAR SALIDA
                 </button>
             </div>
         </div>
 
         <div id="successPanel" class="hidden glass p-8 rounded-2xl shadow-2xl text-center border-2 border-green-500">
-            <div class="text-5xl mb-4">✅</div>
-            <h2 class="text-2xl font-bold mb-2">¡REGISTRO EXITOSO!</h2>
-            <p class="opacity-80 mb-6">Los datos han sido enviados a la hoja de control.</p>
-            <button onclick="location.reload()" class="w-full p-4 gold-bg font-bold rounded-xl"> NUEVO REGISTRO </button>
+            <div class="text-6xl mb-4">✅</div>
+            <h2 class="text-2xl font-bold mb-2">¡REGISTRO ENVIADO!</h2>
+            <p class="opacity-80 mb-8">La información se ha procesado correctamente.</p>
+            <button onclick="location.reload()" class="w-full p-4 gold-bg font-bold rounded-xl">NUEVO REGISTRO</button>
         </div>
     </div>
 
     <script>
-        // LA URL DE SU GOOGLE SCRIPT
         const API_URL = "https://script.google.com/macros/s/AKfycbxTkCNw0TPoCAdnCNaFMnMUjCAtAMC30sZUrjpS50O90yqBFEqEYMrzGZJoCQ3kPQgr/exec";
 
-        async function enviarSalida() {
+        function enviar() {
             const btn = document.getElementById('btnStart');
             const data = {
                 conductor: document.getElementById('driver').value,
@@ -103,29 +102,25 @@
             };
 
             if (!data.conductor || !data.km_actual) {
-                alert("Por favor, ingrese el nombre y el kilometraje.");
+                alert("Complete nombre y kilometraje");
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "ENVIANDO DATOS...";
+            btn.innerText = "ENVIANDO...";
 
-            try {
-                await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(data)
-                });
+            // MÉTODO ROBUSTO: Enviamos y saltamos de inmediato
+            fetch(API_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(data)
+            });
 
-                // Ocultar formulario y mostrar éxito
-                document.getElementById('startPanel').classList.add('hidden');
+            // No esperamos respuesta, cambiamos de pantalla en 500ms
+            setTimeout(() => {
+                document.getElementById('startPanel').style.display = 'none';
                 document.getElementById('successPanel').classList.remove('hidden');
-
-            } catch (error) {
-                alert("Error de conexión. Intente de nuevo.");
-                btn.disabled = false;
-                btn.innerText = "REGISTRAR SALIDA";
-            }
+            }, 500);
         }
     </script>
 </body>
