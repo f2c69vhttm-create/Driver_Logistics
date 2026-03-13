@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PG Driver Logistics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            background: linear-gradient(135deg, #001a33 0%, #002366 100%); 
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        .gold-border { border: 2px solid #c5a059; }
+        .gold-text { color: #c5a059; }
+        .gold-bg { background-color: #c5a059; color: #002366; }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        input, select {
+            background: rgba(0, 0, 0, 0.2) !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <header class="text-center mb-8 pt-4">
+        <h1 class="text-3xl font-bold gold-text tracking-widest">PG DRIVER LOGISTICS</h1>
+        <p class="text-xs uppercase tracking-widest opacity-70">Playa Grande Golf & Ocean Club</p>
+    </header>
+
+    <div class="max-w-md mx-auto">
+        <div id="startPanel" class="glass p-6 rounded-2xl shadow-2xl">
+            <h2 class="text-xl font-semibold mb-6 text-center border-b border-[#c5a059] pb-2">REGISTRO DE SALIDA</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase mb-1 opacity-70">Nombre del Driver</label>
+                    <input type="text" id="driver" class="w-full p-3 rounded gold-border outline-none focus:ring-2 focus:ring-[#c5a059]" placeholder="Ej. Juan Pérez">
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase mb-1 opacity-70">Vehículo</label>
+                    <select id="vehicle" class="w-full p-3 rounded gold-border outline-none">
+                        <option value="Tahoe 2026 #1">Chevrolet Tahoe 2026 #1</option>
+                        <option value="Tahoe 2026 #2">Chevrolet Tahoe 2026 #2</option>
+                        <option value="Suburban 2026 #1">Chevrolet Suburban 2026 #1</option>
+                        <option value="Mercedes Sprinter">Mercedes-Benz Sprinter</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs uppercase mb-1 opacity-70">Villa</label>
+                        <input type="text" id="villa" class="w-full p-3 rounded gold-border outline-none" placeholder="Ej. 15">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase mb-1 opacity-70">Pasajeros</label>
+                        <input type="number" id="pax" class="w-full p-3 rounded gold-border outline-none" placeholder="0">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase mb-1 opacity-70">Destino</label>
+                    <input type="text" id="destino" class="w-full p-3 rounded gold-border outline-none" placeholder="Ej. Aeropuerto POP">
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase mb-1 opacity-70">Kilometraje Inicial</label>
+                    <input type="number" id="km_inicio" class="w-full p-3 rounded gold-border outline-none text-xl font-bold text-[#c5a059]" placeholder="000000">
+                </div>
+
+                <button onclick="startTrip()" class="w-full p-4 gold-bg font-bold rounded-xl mt-4 hover:scale-95 transition-transform">
+                    REGISTRAR SALIDA
+                </button>
+            </div>
+        </div>
+
+        <div id="endPanel" class="hidden glass p-6 rounded-2xl shadow-2xl border-2 border-green-500">
+            <h2 class="text-xl font-semibold mb-2 text-center text-green-400">VIAJE EN CURSO</h2>
+            <p id="tripInfo" class="text-center text-sm mb-6 opacity-80"></p>
+            
+            <div class="space-y-4 text-center">
+                <div class="p-4 bg-black bg-opacity-30 rounded-lg mb-4">
+                    <p class="text-xs uppercase opacity-60">Hora de Salida</p>
+                    <p id="startTimeDisp" class="text-lg font-mono"></p>
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase mb-1 opacity-70 text-left">Kilometraje Final</label>
+                    <input type="number" id="km_final" class="w-full p-4 rounded gold-border outline-none text-2xl font-bold text-green-400" placeholder="000000">
+                </div>
+
+                <button onclick="endTrip()" class="w-full p-4 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-colors">
+                    FINALIZAR VIAJE Y NOTIFICAR
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // REEMPLAZA ESTO CON TU URL DE GOOGLE APPS SCRIPT
+        const API_URL = "TU_URL_DE_GOOGLE_SCRIPT_AQUI";
+        
+        let currentTripId = null;
+
+        async function startTrip() {
+            const btn = document.querySelector('button');
+            const data = {
+                action: "START",
+                driver: document.getElementById('driver').value,
+                vehicle: document.getElementById('vehicle').value,
+                villa: document.getElementById('villa').value,
+                pax: document.getElementById('pax').value,
+                destino: document.getElementById('destino').value,
+                km_inicio: document.getElementById('km_inicio').value
+            };
+
+            if(!data.driver || !data.km_inicio) {
+                alert("Por favor complete el nombre y el kilometraje inicial.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "PROCESANDO...";
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(data)
+                });
+                
+                // Como usamos no-cors, simulamos éxito o guardamos ID localmente
+                currentTripId = "TRIP-" + Date.now();
+                localStorage.setItem('currentTripId', currentTripId);
+                localStorage.setItem('km_inicio', data.km_inicio);
+
+                showEndPanel(data);
+            } catch (error) {
+                alert("Error al conectar con el servidor.");
+                btn.disabled = false;
+                btn.innerText = "REGISTRAR SALIDA";
+            }
+        }
+
+        function showEndPanel(data) {
+            document.getElementById('startPanel').classList.add('hidden');
+            document.getElementById('endPanel').classList.remove('hidden');
+            document.getElementById('tripInfo').innerText = `${data.vehicle} | Driver: ${data.driver}`;
+            document.getElementById('startTimeDisp').innerText = new Date().toLocaleTimeString();
+        }
+
+        async function endTrip() {
+            const kmFinal = document.getElementById('km_final').value;
+            const kmInicio = localStorage.getItem('km_inicio');
+
+            if(!kmFinal || parseFloat(kmFinal) <= parseFloat(kmInicio)) {
+                alert("El kilometraje final debe ser mayor al inicial.");
+                return;
+            }
+
+            const data = {
+                action: "END",
+                tripId: currentTripId || localStorage.getItem('currentTripId'),
+                km_final: kmFinal
+            };
+
+            await fetch(API_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(data)
+            });
+
+            alert("VIAJE FINALIZADO: Reporte enviado exitosamente.");
+            localStorage.clear();
+            location.reload();
+        }
+    </script>
+</body>
+</html>
