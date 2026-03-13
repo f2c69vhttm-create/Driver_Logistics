@@ -107,54 +107,65 @@
         
         let currentTripId = null;
 
-        async function  {startTrip() {
-            const btn = document.querySelector('button');
-            const data = {
-                action: "START",
-                driver: document.getElementById('driver').value,
-                vehicle: document.getElementById('vehicle').value,
-                villa: document.getElementById('villa').value,
-                pax: document.getElementById('pax').value,
-                destino: document.getElementById('destino').value,
-                km_inicio: document.getElementById('km_inicio').value
-            };
+        async function  {<script>
+    // 1. Su enlace de Google Sheets (asegúrese de que termine en output=csv)
+    const API_URL = "SU_ENLACE_DE_GOOGLE_SHEETS_AQUI";
 
-            if(!data.driver || !data.km_inicio) {
-                alert("Por favor complete el nombre y el kilometraje inicial.");
-                return;
-            }
+    // Función para llenar los menús (Drivers, Vehículos, etc.)
+    async function cargarListas() {
+        try {
+            const respuesta = await fetch(API_URL);
+            const texto = await respuesta.text();
+            const filas = texto.split('\n').slice(1); // Ignora el encabezado
 
-            btn.disabled = true;
-            btn.innerText = "PROCESANDO...";
+            const selectDriver = document.getElementById('driver');
+            const selectVehicle = document.getElementById('vehicle');
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(data)
-                });
+            // Limpiamos las listas actuales
+            selectDriver.innerHTML = '<option value="">Seleccione Driver</option>';
+            selectVehicle.innerHTML = '<option value="">Seleccione Vehículo</option>';
+
+            filas.forEach(fila => {
+                const columnas = fila.split(',');
                 
-                // Como usamos no-cors, simulamos éxito o guardamos ID localmente
-                currentTripId = "TRIP-" + Date.now();
-                localStorage.setItem('currentTripId', currentTripId);
-                localStorage.setItem('km_inicio', data.km_inicio);
-
-                showEndPanel(data);
-            } catch (error) {
-                alert("Error al conectar con el servidor.");
-                btn.disabled = false;
-                btn.innerText = "REGISTRAR SALIDA";
-            }
+                // Si la columna 0 tiene el nombre del Driver, lo agrega
+                if(columnas[0]) {
+                    let opt = document.createElement('option');
+                    opt.value = columnas[0].trim();
+                    opt.text = columnas[0].trim();
+                    selectDriver.appendChild(opt);
+                }
+                
+                // Si la columna 1 tiene el Vehículo, lo agrega
+                if(columnas[1]) {
+                    let opt = document.createElement('option');
+                    opt.value = columnas[1].trim();
+                    opt.text = columnas[1].trim();
+                    selectVehicle.appendChild(opt);
+                }
+            });
+        } catch (e) {
+            console.error("Error cargando datos:", e);
         }
+    }
 
-        function showEndPanel(data)
-            document.getElementById('startPanel').classList.add('hidden');
-            document.getElementById('endPanel').classList.remove('hidden');
-            document.getElementById('tripInfo').innerText = `${data.vehicle} | Driver: ${data.driver}`;
-            document.getElementById('startTimeDisp').innerText = new Date().toLocaleTimeString();
-        }
+    // Función para registrar la salida
+    async function registrarSalida() {
+        const btn = document.querySelector('button');
+        btn.disabled = true;
+        btn.innerText = "PROCESANDO...";
+        
+        // Aquí va la lógica de envío que ya tiene
+        alert("Registro enviado a la base de datos");
+        
+        btn.disabled = false;
+        btn.innerText = "REGISTRAR SALIDA";
+    }
 
-        async function endTrip() {
+    // Esto hace que las listas se carguen apenas abra la página
+    window.onload = cargarListas;
+</script>
+ {
             const kmFinal = document.getElementById('km_final').value;
             const kmInicio = localStorage.getItem('km_inicio');
 
