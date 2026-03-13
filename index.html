@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PG Driver Logistics</title>
+    <title>PG Driver Logistics v2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { 
             background: linear-gradient(135deg, #001a33 0%, #002366 100%); 
             color: white; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             min-height: 100vh;
         }
         .gold-border { border: 2px solid #c5a059; }
@@ -20,30 +20,33 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        input, select {
-            background: rgba(0, 0, 0, 0.3) !important;
-            color: white !important;
-        }
+        .tab-active { border-bottom: 4px solid #c5a059; color: #c5a059; font-weight: bold; }
+        input, select { background: rgba(0, 0, 0, 0.3) !important; color: white !important; }
     </style>
 </head>
 <body class="p-4">
-    <header class="text-center mb-8 pt-4">
-        <h1 class="text-3xl font-bold gold-text tracking-widest uppercase">PG Driver Logistics</h1>
-        <p class="text-xs uppercase tracking-widest opacity-70">Playa Grande Golf & Ocean Club</p>
+    <header class="text-center mb-6 pt-4">
+        <h1 class="text-3xl font-bold gold-text tracking-widest uppercase">PG Logistics</h1>
+        <p class="text-xs uppercase tracking-widest opacity-70">Control de Flota - Playa Grande</p>
     </header>
 
     <div class="max-w-md mx-auto">
-        <div id="startPanel" class="glass p-6 rounded-2xl shadow-2xl">
-            <h2 class="text-xl font-semibold mb-6 text-center border-b border-[#c5a059] pb-2 text-white">REGISTRO DE SALIDA</h2>
-            
+        <div class="flex mb-6 text-center border-b border-white/10">
+            <div id="tab1" onclick="switchTab('salida')" class="flex-1 p-3 cursor-pointer tab-active">SALIDA</div>
+            <div id="tab2" onclick="switchTab('entrada')" class="flex-1 p-3 cursor-pointer opacity-50">ENTRADA</div>
+        </div>
+
+        <div id="formPanel" class="glass p-6 rounded-2xl shadow-2xl">
             <form id="logisticsForm" class="space-y-4">
-                <div>
+                <input type="hidden" name="action" id="formAction" value="salida">
+                
+                <div id="sectionConductor">
                     <label class="block text-xs uppercase mb-1 opacity-70">Nombre del Driver</label>
-                    <input type="text" name="conductor" id="driver" required class="w-full p-3 rounded gold-border outline-none">
+                    <input type="text" name="conductor" id="driver" class="w-full p-3 rounded gold-border outline-none">
                 </div>
 
                 <div>
-                    <label class="block text-xs uppercase mb-1 opacity-70">Vehículo</label>
+                    <label class="block text-xs uppercase mb-1 opacity-70">Vehículo / Unidad</label>
                     <select name="unidad" id="vehicle" class="w-full p-3 rounded gold-border outline-none">
                         <option value="Tahoe 2026 #1">Chevrolet Tahoe 2026 #1</option>
                         <option value="Tahoe 2026 #2">Chevrolet Tahoe 2026 #2</option>
@@ -52,76 +55,88 @@
                     </select>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs uppercase mb-1 opacity-70">Villa</label>
-                        <input type="text" name="villa" id="villa" class="w-full p-3 rounded gold-border outline-none">
+                <div id="extraFields" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs uppercase mb-1 opacity-70">Villa</label>
+                            <input type="text" name="villa" class="w-full p-3 rounded gold-border outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase mb-1 opacity-70">Pax</label>
+                            <input type="number" name="pasajeros" class="w-full p-3 rounded gold-border outline-none">
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase mb-1 opacity-70">Pasajeros</label>
-                        <input type="number" name="pasajeros" id="pax" class="w-full p-3 rounded gold-border outline-none">
+                        <label class="block text-xs uppercase mb-1 opacity-70">Destino</label>
+                        <input type="text" name="destino" class="w-full p-3 rounded gold-border outline-none">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs uppercase mb-1 opacity-70">Destino</label>
-                    <input type="text" name="destino" id="destino" class="w-full p-3 rounded gold-border outline-none">
+                    <label id="kmLabel" class="block text-xs uppercase mb-1 opacity-70 font-bold gold-text">Kilometraje Inicial</label>
+                    <input type="number" name="km_actual" id="km" required class="w-full p-3 rounded gold-border outline-none text-xl font-bold">
                 </div>
 
-                <div>
-                    <label class="block text-xs uppercase mb-1 opacity-70 font-bold gold-text">Kilometraje Inicial</label>
-                    <input type="number" name="km_actual" id="km_inicio" required class="w-full p-3 rounded gold-border outline-none text-xl font-bold">
-                </div>
-
-                <button type="button" onclick="enviarDatos()" id="btnStart" class="w-full p-4 gold-bg font-bold rounded-xl mt-4 hover:opacity-90 transition-all">
-                    REGISTRAR SALIDA
+                <button type="button" onclick="enviar()" id="btnSubmit" class="w-full p-4 gold-bg font-bold rounded-xl mt-4 uppercase tracking-widest">
+                    Registrar Salida
                 </button>
             </form>
         </div>
 
         <div id="successPanel" class="hidden glass p-8 rounded-2xl shadow-2xl text-center border-2 border-green-500">
             <div class="text-6xl mb-4">✅</div>
-            <h2 class="text-2xl font-bold mb-2 text-white">¡REGISTRO ENVIADO!</h2>
-            <p class="opacity-80 mb-8 text-white">La información se ha procesado correctamente en Google Sheets.</p>
+            <h2 class="text-2xl font-bold mb-2">PROCESADO</h2>
+            <p id="successMsg" class="opacity-80 mb-8">El registro se ha guardado correctamente.</p>
             <button onclick="location.reload()" class="w-full p-4 gold-bg font-bold rounded-xl">NUEVO REGISTRO</button>
         </div>
     </div>
 
     <script>
-        // REEMPLAZA ESTA URL CON TU NUEVA URL DE DESPLIEGUE (EXEC)
-        const API_URL = "https://script.google.com/macros/s/AKfycby_GmsgG5yJ3VkCms_Wx_hiEl8zvtNDkrmi1jJPjb441UsFkfKDgqP1_VmbfsZJjeSI1A/exec";
+        // URL de tu Script ya integrada
+        const API_URL = "https://script.google.com/macros/s/AKfycbx8lo5fm3IF22zu6on_Q9o3-JDtw-iM4Uyd9cSz0_VhCJskIum3oBxRHMKLewz1T7fGLQ/exec";
 
-        function enviarDatos() {
-            const btn = document.getElementById('btnStart');
+        function switchTab(type) {
+            const isSalida = type === 'salida';
+            document.getElementById('formAction').value = type;
+            
+            // Cambiar apariencia de pestañas
+            document.getElementById('tab1').className = isSalida ? 'flex-1 p-3 cursor-pointer tab-active' : 'flex-1 p-3 cursor-pointer opacity-50';
+            document.getElementById('tab2').className = !isSalida ? 'flex-1 p-3 cursor-pointer tab-active' : 'flex-1 p-3 cursor-pointer opacity-50';
+            
+            // Mostrar/Ocultar campos según el tipo
+            document.getElementById('extraFields').style.display = isSalida ? 'block' : 'none';
+            document.getElementById('sectionConductor').style.display = isSalida ? 'block' : 'none';
+            
+            // Ajustar textos
+            document.getElementById('kmLabel').innerText = isSalida ? 'Kilometraje Inicial' : 'Kilometraje Final (Llegada)';
+            document.getElementById('btnSubmit').innerText = isSalida ? 'Registrar Salida' : 'Registrar Entrada';
+        }
+
+        function enviar() {
+            const btn = document.getElementById('btnSubmit');
             const form = document.getElementById('logisticsForm');
             
-            // Verificación simple
-            if (!document.getElementById('driver').value || !document.getElementById('km_inicio').value) {
-                alert("Por favor, Sr. Solana, complete el nombre y el kilometraje.");
+            if (!document.getElementById('km').value) {
+                alert("Por favor inserte el kilometraje.");
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "ENVIANDO A SISTEMA...";
+            btn.innerText = "PROCESANDO...";
 
-            // Usamos URLSearchParams para máxima compatibilidad con Google Apps Script
             const formData = new URLSearchParams(new FormData(form));
 
             fetch(API_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Evita problemas de seguridad entre dominios
+                mode: 'no-cors',
                 body: formData
-            })
-            .then(() => {
-                // Transición visual
-                document.getElementById('startPanel').classList.add('hidden');
+            }).then(() => {
+                document.getElementById('formPanel').classList.add('hidden');
                 document.getElementById('successPanel').classList.remove('hidden');
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("Hubo un error en la conexión.");
+            }).catch(error => {
+                alert("Error de conexión");
                 btn.disabled = false;
-                btn.innerText = "REINTENTAR REGISTRO";
+                btn.innerText = "REINTENTAR";
             });
         }
     </script>
