@@ -103,7 +103,7 @@
 
     <script>
         // REEMPLAZA ESTO CON TU URL DE GOOGLE APPS SCRIPT
-        const API_URL = "TU_URL_DE_GOOGLE_SCRIPT_AQUI";
+        const API_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTu91weCqeRNqNG_Uy2QgW1gzZrpPI01f_HnA3uWdssr6zOM2lo-S4nwhaGXFWFy7mNYvcOr9jk57St/pub?output=csv";
         
         let currentTripId = null;
 
