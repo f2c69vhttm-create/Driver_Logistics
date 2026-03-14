@@ -3,25 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PG Driver Logistics v2</title>
+    <title>PG Driver Logistics v2.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { 
-            background: linear-gradient(135deg, #001a33 0%, #002366 100%); 
-            color: white; 
-            font-family: 'Segoe UI', sans-serif;
-            min-height: 100vh;
-        }
+        body { background: linear-gradient(135deg, #001a33 0%, #002366 100%); color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
         .gold-border { border: 2px solid #c5a059; }
         .gold-text { color: #c5a059; }
         .gold-bg { background-color: #c5a059; color: #002366; }
-        .glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .tab-active { border-bottom: 4px solid #c5a059; color: #c5a059; font-weight: bold; }
         input, select { background: rgba(0, 0, 0, 0.3) !important; color: white !important; }
+        optgroup { background: #001a33; color: #c5a059; font-weight: bold; }
+        option { background: #001a33; color: white; }
     </style>
 </head>
 <body class="p-4">
@@ -42,23 +35,40 @@
                 
                 <div id="sectionConductor">
                     <label class="block text-xs uppercase mb-1 opacity-70">Nombre del Driver</label>
-                    <input type="text" name="conductor" id="driver" class="w-full p-3 rounded gold-border outline-none">
+                    <input type="text" name="conductor" id="driver" placeholder="Ingrese nombre" class="w-full p-3 rounded gold-border outline-none">
                 </div>
 
                 <div>
-                    <label class="block text-xs uppercase mb-1 opacity-70">Vehículo / Unidad</label>
-                    <select name="unidad" id="vehicle" class="w-full p-3 rounded gold-border outline-none">
-                        <option value="Tahoe 2026 #1">Chevrolet Tahoe 2026 #1</option>
-                        <option value="Tahoe 2026 #2">Chevrolet Tahoe 2026 #2</option>
-                        <option value="Suburban 2026 #1">Chevrolet Suburban 2026 #1</option>
-                        <option value="Mercedes Sprinter">Mercedes-Benz Sprinter</option>
+                    <label class="block text-xs uppercase mb-1 opacity-70">Vehículo (Por Placa)</label>
+                    <select name="unidad" id="vehicle" class="w-full p-3 rounded gold-border outline-none text-lg">
+                        <option value="" disabled selected>Seleccione la unidad...</option>
+                        
+                        <optgroup label="CHEVROLET TAHOE SUV">
+                            <option value="Tahoe 6785 SUV">Tahoe (Placa 6785)</option>
+                            <option value="Tahoe 0255 SUV">Tahoe (Placa 0255)</option>
+                            <option value="Tahoe 1702 SUV">Tahoe (Placa 1702)</option>
+                            <option value="Tahoe 4504 SUV">Tahoe (Placa 4504)</option>
+                            <option value="Tahoe 0846 SUV">Tahoe (Placa 0846)</option>
+                        </optgroup>
+
+                        <optgroup label="CHEVROLET SUBURBAN SUV">
+                            <option value="Suburban 0663 SUV">Suburban (Placa 0663)</option>
+                            <option value="Suburban 0666 SUV">Suburban (Placa 0666)</option>
+                            <option value="Suburban 3354 SUV">Suburban (Placa 3354)</option>
+                            <option value="Suburban 7149 SUV">Suburban (Placa 7149)</option>
+                            <option value="Suburban 7938 SUV">Suburban (Placa 7938)</option>
+                        </optgroup>
+
+                        <optgroup label="MERCEDES-BENZ VAN">
+                            <option value="Sprinter 6689 VAN">Sprinter (Placa 6689)</option>
+                        </optgroup>
                     </select>
                 </div>
 
                 <div id="extraFields" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs uppercase mb-1 opacity-70">Villa</label>
+                            <label class="block text-xs uppercase mb-1 opacity-70">Villa / Miembro</label>
                             <input type="text" name="villa" class="w-full p-3 rounded gold-border outline-none">
                         </div>
                         <div>
@@ -74,7 +84,7 @@
 
                 <div>
                     <label id="kmLabel" class="block text-xs uppercase mb-1 opacity-70 font-bold gold-text">Kilometraje Inicial</label>
-                    <input type="number" name="km_actual" id="km" required class="w-full p-3 rounded gold-border outline-none text-xl font-bold">
+                    <input type="number" name="km_actual" id="km" required class="w-full p-3 rounded gold-border outline-none text-xl font-bold" placeholder="0">
                 </div>
 
                 <button type="button" onclick="enviar()" id="btnSubmit" class="w-full p-4 gold-bg font-bold rounded-xl mt-4 uppercase tracking-widest">
@@ -85,46 +95,40 @@
 
         <div id="successPanel" class="hidden glass p-8 rounded-2xl shadow-2xl text-center border-2 border-green-500">
             <div class="text-6xl mb-4">✅</div>
-            <h2 class="text-2xl font-bold mb-2">PROCESADO</h2>
-            <p id="successMsg" class="opacity-80 mb-8">El registro se ha guardado correctamente.</p>
+            <h2 class="text-2xl font-bold mb-2">SINCRO EXITOSA</h2>
+            <p id="successMsg" class="opacity-80 mb-8">El registro se envió a la nube.</p>
             <button onclick="location.reload()" class="w-full p-4 gold-bg font-bold rounded-xl">NUEVO REGISTRO</button>
         </div>
     </div>
 
     <script>
-        // URL de tu Script ya integrada
         const API_URL = "https://script.google.com/macros/s/AKfycbx8lo5fm3IF22zu6on_Q9o3-JDtw-iM4Uyd9cSz0_VhCJskIum3oBxRHMKLewz1T7fGLQ/exec";
 
         function switchTab(type) {
             const isSalida = type === 'salida';
             document.getElementById('formAction').value = type;
-            
-            // Cambiar apariencia de pestañas
             document.getElementById('tab1').className = isSalida ? 'flex-1 p-3 cursor-pointer tab-active' : 'flex-1 p-3 cursor-pointer opacity-50';
             document.getElementById('tab2').className = !isSalida ? 'flex-1 p-3 cursor-pointer tab-active' : 'flex-1 p-3 cursor-pointer opacity-50';
-            
-            // Mostrar/Ocultar campos según el tipo
             document.getElementById('extraFields').style.display = isSalida ? 'block' : 'none';
             document.getElementById('sectionConductor').style.display = isSalida ? 'block' : 'none';
-            
-            // Ajustar textos
-            document.getElementById('kmLabel').innerText = isSalida ? 'Kilometraje Inicial' : 'Kilometraje Final (Llegada)';
+            document.getElementById('kmLabel').innerText = isSalida ? 'Kilometraje Inicial' : 'Kilometraje Final';
             document.getElementById('btnSubmit').innerText = isSalida ? 'Registrar Salida' : 'Registrar Entrada';
         }
 
         function enviar() {
             const btn = document.getElementById('btnSubmit');
-            const form = document.getElementById('logisticsForm');
+            const vehicle = document.getElementById('vehicle').value;
+            const km = document.getElementById('km').value;
             
-            if (!document.getElementById('km').value) {
-                alert("Por favor inserte el kilometraje.");
+            if (!vehicle || !km) {
+                alert("Por favor, Sr. Solana, seleccione la unidad e ingrese el kilometraje.");
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "PROCESANDO...";
+            btn.innerText = "ENVIANDO...";
 
-            const formData = new URLSearchParams(new FormData(form));
+            const formData = new URLSearchParams(new FormData(document.getElementById('logisticsForm')));
 
             fetch(API_URL, {
                 method: 'POST',
@@ -133,10 +137,6 @@
             }).then(() => {
                 document.getElementById('formPanel').classList.add('hidden');
                 document.getElementById('successPanel').classList.remove('hidden');
-            }).catch(error => {
-                alert("Error de conexión");
-                btn.disabled = false;
-                btn.innerText = "REINTENTAR";
             });
         }
     </script>
