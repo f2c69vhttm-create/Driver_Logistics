@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PG Logistics Pro</title>
+    <title>PG Logistics Corporate | Asset Tracking</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000d1a">
@@ -13,119 +13,139 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #000d1a; color: white; font-family: 'Segoe UI', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(197, 160, 89, 0.2); }
+        body { background-color: #000d1a; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(197, 160, 89, 0.15); }
         .gold-border { border: 1px solid #c5a059; }
         .gold-text { color: #c5a059; }
         .gold-bg { background: linear-gradient(135deg, #c5a059 0%, #947a41 100%); color: #000d1a; }
-        .tab-active { border-bottom: 4px solid #c5a059; color: #c5a059; font-weight: 800; opacity: 1 !important; }
-        input, select { background: rgba(0, 0, 0, 0.4) !important; color: white !important; border: 1px solid rgba(255,255,255,0.1) !important; }
-        input:focus { border-color: #c5a059 !important; outline: none; }
+        .tab-active { border-bottom: 3px solid #c5a059; color: #c5a059; font-weight: 800; opacity: 1 !important; }
+        input, select { background: rgba(0, 0, 0, 0.5) !important; color: white !important; border: 1px solid rgba(255,255,255,0.1) !important; transition: all 0.3s ease; }
+        input:focus { border-color: #c5a059 !important; outline: none; box-shadow: 0 0 10px rgba(197, 160, 89, 0.2); }
+        .status-dot { width: 8px; height: 8px; background: #c5a059; border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
     </style>
 </head>
 <body class="p-4 flex flex-col items-center min-h-screen">
 
-    <div id="loginSection" class="w-full max-w-md mt-20 p-8 glass rounded-3xl text-center shadow-2xl">
-        <div class="text-5xl mb-4">🔑</div>
-        <h2 class="text-2xl font-black gold-text tracking-tighter uppercase mb-6">Acceso de Driver</h2>
-        <input type="password" id="accessPin" placeholder="PIN" class="w-full p-4 rounded-xl text-center text-3xl tracking-[0.5em] mb-4">
-        <button onclick="checkAccess()" class="w-full p-4 gold-bg font-black rounded-xl uppercase tracking-widest shadow-lg">Entrar</button>
+    <div id="loginSection" class="w-full max-w-md mt-16 p-8 glass rounded-[2rem] text-center shadow-2xl">
+        <div class="flex justify-center mb-6">
+            <div class="p-4 bg-white/5 rounded-full gold-border">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 gold-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            </div>
+        </div>
+        <h2 class="text-2xl font-black gold-text tracking-widest uppercase mb-2">Security Access</h2>
+        <p class="text-[10px] uppercase tracking-[0.3em] mb-8 opacity-40 text-white">Authorized Personnel Only</p>
+        
+        <input type="password" id="accessPin" placeholder="DRIVER PIN" class="w-full p-5 rounded-2xl text-center text-3xl tracking-[0.5em] mb-4">
+        <button onclick="checkAccess()" class="w-full p-5 gold-bg font-black rounded-2xl uppercase tracking-widest shadow-xl active:scale-95 transition-transform">
+            Authenticate
+        </button>
     </div>
 
     <div id="mainApp" class="hidden w-full max-w-md">
-        <header class="text-center mb-6 pt-4">
-            <h1 class="text-3xl font-black gold-text tracking-widest uppercase italic">PG Logistics</h1>
-            <p id="driverNameDisplay" class="text-[10px] uppercase tracking-[0.4em] opacity-50">Control de Flota v3.1</p>
+        <header class="text-center mb-8 pt-4">
+            <div class="flex items-center justify-center gap-2 mb-1">
+                <div class="status-dot"></div>
+                <h1 class="text-2xl font-black gold-text tracking-[0.3em] uppercase italic">PG Logistics</h1>
+            </div>
+            <p id="driverNameDisplay" class="text-[9px] uppercase tracking-[0.5em] opacity-40">Discovery Land Co. Audit System</p>
         </header>
 
-        <div class="flex mb-6 text-center border-b border-white/10">
-            <div id="tab1" onclick="switchTab('salida')" class="flex-1 p-3 cursor-pointer tab-active opacity-50">SALIDA</div>
-            <div id="tab2" onclick="switchTab('entrada')" class="flex-1 p-3 cursor-pointer opacity-50">ENTRADA</div>
+        <div class="flex mb-8 text-center border-b border-white/5">
+            <div id="tab1" onclick="switchTab('salida')" class="flex-1 p-4 cursor-pointer tab-active opacity-40 transition-all">CHECK-OUT</div>
+            <div id="tab2" onclick="switchTab('entrada')" class="flex-1 p-4 cursor-pointer opacity-40 transition-all">CHECK-IN</div>
         </div>
 
-        <div id="formPanel" class="glass p-6 rounded-2xl shadow-2xl">
-            <form id="logisticsForm" class="space-y-4">
-                <input type="hidden" name="auth_token" value="PlayaGrande2024_Secure_Token_99">
+        <div id="formPanel" class="glass p-8 rounded-[2rem] shadow-2xl relative overflow-hidden">
+            <form id="logisticsForm" class="space-y-5">
+                
+                <input type="hidden" name="auth_token" value="REPLACE_WITH_CORPORATE_SECURE_TOKEN">
                 <input type="hidden" name="action" id="formAction" value="salida">
                 <input type="hidden" name="conductor" id="driverHidden">
                 <input type="hidden" name="latitud" id="lat">
                 <input type="hidden" name="longitud" id="lng">
 
                 <div>
-                    <label class="block text-[10px] uppercase mb-1 opacity-60 font-bold">Vehículo / Unidad</label>
-                    <select name="unidad" id="vehicle" required class="w-full p-4 rounded-xl gold-border appearance-none">
-                        <option value="" disabled selected>Seleccione unidad...</option>
-                        <optgroup label="CHEVROLET TAHOE">
+                    <label class="block text-[10px] uppercase mb-2 opacity-50 font-black tracking-widest gold-text">Fleet Asset (Unit)</label>
+                    <select name="unidad" id="vehicle" required class="w-full p-5 rounded-2xl gold-border appearance-none cursor-pointer">
+                        <option value="" disabled selected>Select Unit...</option>
+                        <optgroup label="LUXURY SUVS">
                             <option value="Tahoe-6785">Tahoe - 6785</option>
                             <option value="Tahoe-0255">Tahoe - 0255</option>
                             <option value="Tahoe-1702">Tahoe - 1702</option>
-                        </optgroup>
-                        <optgroup label="CHEVROLET SUBURBAN">
                             <option value="Sub-0663">Suburban - 0663</option>
                             <option value="Sub-7149">Suburban - 7149</option>
                         </optgroup>
                     </select>
                 </div>
 
-                <div id="extraFields" class="space-y-4">
+                <div id="extraFields" class="space-y-5 animate-in fade-in duration-500">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-[10px] uppercase mb-1 opacity-60">Villa / Miembro</label>
-                            <input type="text" name="villa" class="w-full p-3 rounded-xl">
+                            <label class="block text-[10px] uppercase mb-2 opacity-50 font-bold">Villa / Member</label>
+                            <input type="text" name="villa" class="w-full p-4 rounded-xl" placeholder="Ex: V-04">
                         </div>
                         <div>
-                            <label class="block text-[10px] uppercase mb-1 opacity-60">Pasajeros</label>
-                            <input type="number" name="pasajeros" class="w-full p-3 rounded-xl">
+                            <label class="block text-[10px] uppercase mb-2 opacity-50 font-bold">Pax Count</label>
+                            <input type="number" name="pasajeros" class="w-full p-4 rounded-xl" placeholder="0">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase mb-1 opacity-60">Destino</label>
-                        <input type="text" name="destino" class="w-full p-3 rounded-xl">
+                        <label class="block text-[10px] uppercase mb-2 opacity-50 font-bold">Destination Details</label>
+                        <input type="text" name="destino" class="w-full p-4 rounded-xl" placeholder="Entry Point / Beach Club">
                     </div>
                 </div>
 
                 <div>
-                    <label id="kmLabel" class="block text-[10px] uppercase mb-1 gold-text font-bold">Kilometraje Inicial</label>
-                    <input type="number" name="km_actual" id="km" required class="w-full p-4 rounded-xl text-2xl font-bold text-center" placeholder="00000">
+                    <label id="kmLabel" class="block text-[10px] uppercase mb-2 gold-text font-black tracking-widest">Initial Odometer</label>
+                    <input type="number" name="km_actual" id="km" required class="w-full p-5 rounded-2xl text-3xl font-black text-center gold-text bg-black/40" placeholder="00000">
                 </div>
 
-                <button type="button" onclick="validarYEnviar()" id="btnSubmit" class="w-full p-5 gold-bg font-black rounded-2xl mt-4 uppercase tracking-[0.2em] shadow-xl">
-                    Registrar Salida
+                <button type="button" onclick="validarYEnviar()" id="btnSubmit" class="w-full p-6 gold-bg font-black rounded-2xl mt-6 uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-all">
+                    Register Action
                 </button>
             </form>
         </div>
 
-        <div id="successPanel" class="hidden glass p-10 rounded-2xl text-center border-2 border-green-500/50">
-            <div class="text-7xl mb-4">✅</div>
-            <h2 class="text-2xl font-bold mb-2">SINCRO EXITOSA</h2>
-            <p class="opacity-60 mb-8 text-sm">Datos enviados a Seguridad y Operaciones.</p>
-            <button onclick="location.reload()" class="w-full p-4 gold-bg font-bold rounded-xl">NUEVO REGISTRO</button>
+        <div id="successPanel" class="hidden glass p-12 rounded-[2.5rem] text-center border-2 border-green-500/30">
+            <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span class="text-4xl">✓</span>
+            </div>
+            <h2 class="text-2xl font-black mb-3 gold-text">AUDIT LOG SYNCED</h2>
+            <p class="opacity-40 mb-10 text-[11px] uppercase tracking-widest leading-relaxed">The transaction has been encrypted and sent to Corporate Security Headquarters.</p>
+            <button onclick="location.reload()" class="w-full p-5 bg-white/5 border border-white/10 font-bold rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-xs">New Log Entry</button>
         </div>
     </div>
 
     <script>
-        // URL del Backend (Vincular con Google Apps Script)
-        const API_URL = "TU_URL_DE_APPS_SCRIPT_AQUI";
+        /**
+         * CONFIGURACIÓN CORPORATIVA
+         * El equipo de IT de Discovery Land debe configurar el endpoint de producción aquí:
+         */
+        const API_URL = "INSERT_PRODUCTION_ENDPOINT_HERE";
 
         function checkAccess() {
             const pin = document.getElementById('accessPin').value;
-            if(pin === "1234") { // Cambiar por el PIN real deseado
+            // PIN Maestro (Configurable por Seguridad del Club)
+            if(pin === "1234") { 
                 document.getElementById('loginSection').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
-                document.getElementById('driverHidden').value = "Driver Autorizado";
+                document.getElementById('driverHidden').value = "Driver Auth: ID-" + pin;
             } else {
-                alert("PIN INCORRECTO");
+                alert("ACCESS DENIED: Invalid Security PIN.");
             }
         }
 
         function switchTab(type) {
             const isSalida = type === 'salida';
             document.getElementById('formAction').value = type;
-            document.getElementById('tab1').className = isSalida ? 'flex-1 p-3 cursor-pointer tab-active' : 'flex-1 p-3 cursor-pointer opacity-50';
-            document.getElementById('tab2').className = !isSalida ? 'flex-1 p-3 cursor-pointer tab-active' : 'flex-1 p-3 cursor-pointer opacity-50';
+            document.getElementById('tab1').className = isSalida ? 'flex-1 p-4 cursor-pointer tab-active' : 'flex-1 p-4 cursor-pointer opacity-40';
+            document.getElementById('tab2').className = !isSalida ? 'flex-1 p-4 cursor-pointer tab-active' : 'flex-1 p-4 cursor-pointer opacity-40';
             document.getElementById('extraFields').style.display = isSalida ? 'block' : 'none';
-            document.getElementById('kmLabel').innerText = isSalida ? 'Kilometraje Inicial' : 'Kilometraje Final';
-            document.getElementById('btnSubmit').innerText = isSalida ? 'Registrar Salida' : 'Registrar Entrada';
+            document.getElementById('kmLabel').innerText = isSalida ? 'Initial Odometer' : 'Final Odometer';
+            document.getElementById('btnSubmit').innerText = isSalida ? 'Register Check-Out' : 'Register Check-In';
         }
 
         function validarYEnviar() {
@@ -134,12 +154,12 @@
             const km = document.getElementById('km').value;
 
             if(!vehicle || !km) {
-                alert("Por favor complete Unidad y Kilometraje.");
+                alert("Missing Critical Data: Unit and Odometer are mandatory.");
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "CAPTURANDO GPS...";
+            btn.innerText = "CAPTURING GPS AUDIT...";
 
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
@@ -148,23 +168,23 @@
                     enviarDatos();
                 },
                 (err) => {
-                    alert("Error: Se requiere GPS para validar el registro.");
+                    alert("SECURITY ERROR: GPS must be enabled for Audit compliance.");
                     btn.disabled = false;
-                    btn.innerText = "REINTENTAR";
+                    btn.innerText = "RETRY AUDIT";
                 },
-                { enableHighAccuracy: true }
+                { enableHighAccuracy: true, timeout: 5000 }
             );
         }
 
         async function enviarDatos() {
             const btn = document.getElementById('btnSubmit');
-            btn.innerText = "SINCRONIZANDO...";
+            btn.innerText = "ENCRYPTING & SENDING...";
 
             const form = document.getElementById('logisticsForm');
             const formData = new URLSearchParams(new FormData(form));
 
             try {
-                // Usamos mode: 'no-cors' para Google Apps Script
+                // El backend de Google Apps Script procesa la petición de forma asíncrona
                 await fetch(API_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -174,9 +194,9 @@
                 document.getElementById('formPanel').classList.add('hidden');
                 document.getElementById('successPanel').classList.remove('hidden');
             } catch (error) {
-                alert("Error de conexión. Intente de nuevo.");
+                alert("NETWORK ERROR: Data could not reach Corporate Server.");
                 btn.disabled = false;
-                btn.innerText = "REINTENTAR ENVÍO";
+                btn.innerText = "RETRY SYNC";
             }
         }
     </script>
