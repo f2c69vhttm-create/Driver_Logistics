@@ -1,0 +1,19 @@
+{
+  "short_name": "PG Logistics",
+  "name": "Playa Grande Driver Logistics",
+  "description": "Sistema de Control de Flota y Logística para Drivers",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/7544/7544957.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#000d1a",
+  "display": "standalone",
+  "scope": "./",
+  "theme_color": "#c5a059",
+  "orientation": "portrait"
+}
