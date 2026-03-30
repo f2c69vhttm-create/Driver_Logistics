@@ -2,67 +2,67 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PG Driver Logistics v2.6</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PG Logistics Pro</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000d1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/7544/7544957.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: linear-gradient(135deg, #001a33 0%, #002366 100%); color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
-        .gold-border { border: 2px solid #c5a059; }
+        body { background-color: #000d1a; color: white; font-family: 'Segoe UI', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(197, 160, 89, 0.2); }
+        .gold-border { border: 1px solid #c5a059; }
         .gold-text { color: #c5a059; }
-        .gold-bg { background-color: #c5a059; color: #002366; }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .tab-active { border-bottom: 4px solid #c5a059; color: #c5a059; font-weight: bold; }
-        input, select { background: rgba(0, 0, 0, 0.3) !important; color: white !important; }
-        optgroup { background: #001a33; color: #c5a059; font-weight: bold; }
-        option { background: #001a33; color: white; }
+        .gold-bg { background: linear-gradient(135deg, #c5a059 0%, #947a41 100%); color: #000d1a; }
+        .tab-active { border-bottom: 4px solid #c5a059; color: #c5a059; font-weight: 800; opacity: 1 !important; }
+        input, select { background: rgba(0, 0, 0, 0.4) !important; color: white !important; border: 1px solid rgba(255,255,255,0.1) !important; }
+        input:focus { border-color: #c5a059 !important; outline: none; }
     </style>
 </head>
-<body class="p-4">
-    <header class="text-center mb-6 pt-4">
-        <h1 class="text-3xl font-bold gold-text tracking-widest uppercase">PG Logistics</h1>
-        <p class="text-xs uppercase tracking-widest opacity-70">Control de Flota - Playa Grande</p>
-    </header>
+<body class="p-4 flex flex-col items-center min-h-screen">
 
-    <div class="max-w-md mx-auto">
+    <div id="loginSection" class="w-full max-w-md mt-20 p-8 glass rounded-3xl text-center shadow-2xl">
+        <div class="text-5xl mb-4">🔑</div>
+        <h2 class="text-2xl font-black gold-text tracking-tighter uppercase mb-6">Acceso de Driver</h2>
+        <input type="password" id="accessPin" placeholder="PIN" class="w-full p-4 rounded-xl text-center text-3xl tracking-[0.5em] mb-4">
+        <button onclick="checkAccess()" class="w-full p-4 gold-bg font-black rounded-xl uppercase tracking-widest shadow-lg">Entrar</button>
+    </div>
+
+    <div id="mainApp" class="hidden w-full max-w-md">
+        <header class="text-center mb-6 pt-4">
+            <h1 class="text-3xl font-black gold-text tracking-widest uppercase italic">PG Logistics</h1>
+            <p id="driverNameDisplay" class="text-[10px] uppercase tracking-[0.4em] opacity-50">Control de Flota v3.1</p>
+        </header>
+
         <div class="flex mb-6 text-center border-b border-white/10">
-            <div id="tab1" onclick="switchTab('salida')" class="flex-1 p-3 cursor-pointer tab-active">SALIDA</div>
+            <div id="tab1" onclick="switchTab('salida')" class="flex-1 p-3 cursor-pointer tab-active opacity-50">SALIDA</div>
             <div id="tab2" onclick="switchTab('entrada')" class="flex-1 p-3 cursor-pointer opacity-50">ENTRADA</div>
         </div>
 
         <div id="formPanel" class="glass p-6 rounded-2xl shadow-2xl">
             <form id="logisticsForm" class="space-y-4">
+                <input type="hidden" name="auth_token" value="PlayaGrande2024_Secure_Token_99">
                 <input type="hidden" name="action" id="formAction" value="salida">
-                <input type="hidden" name="latitud" id="latitud">
-                <input type="hidden" name="longitud" id="longitud">
-                
-                <div id="sectionConductor">
-                    <label class="block text-xs uppercase mb-1 opacity-70">Nombre del Driver</label>
-                    <input type="text" name="conductor" id="driver" placeholder="Ingrese nombre" class="w-full p-3 rounded gold-border outline-none">
-                </div>
+                <input type="hidden" name="conductor" id="driverHidden">
+                <input type="hidden" name="latitud" id="lat">
+                <input type="hidden" name="longitud" id="lng">
 
                 <div>
-                    <label class="block text-xs uppercase mb-1 opacity-70">Vehículo (Por Placa)</label>
-                    <select name="unidad" id="vehicle" class="w-full p-3 rounded gold-border outline-none text-lg">
-                        <option value="" disabled selected>Seleccione la unidad...</option>
-                        
+                    <label class="block text-[10px] uppercase mb-1 opacity-60 font-bold">Vehículo / Unidad</label>
+                    <select name="unidad" id="vehicle" required class="w-full p-4 rounded-xl gold-border appearance-none">
+                        <option value="" disabled selected>Seleccione unidad...</option>
                         <optgroup label="CHEVROLET TAHOE">
-                            <option value="Tahoe - 6785">Tahoe - 6785</option>
-                            <option value="Tahoe - 0255">Tahoe - 0255</option>
-                            <option value="Tahoe - 1702">Tahoe - 1702</option>
-                            <option value="Tahoe - 4504">Tahoe - 4504</option>
-                            <option value="Tahoe - 0846">Tahoe - 0846</option>
+                            <option value="Tahoe-6785">Tahoe - 6785</option>
+                            <option value="Tahoe-0255">Tahoe - 0255</option>
+                            <option value="Tahoe-1702">Tahoe - 1702</option>
                         </optgroup>
-
                         <optgroup label="CHEVROLET SUBURBAN">
-                            <option value="Suburban - 0663">Suburban - 0663</option>
-                            <option value="Suburban - 0666">Suburban - 0666</option>
-                            <option value="Suburban - 3354">Suburban - 3354</option>
-                            <option value="Suburban - 7149">Suburban - 7149</option>
-                            <option value="Suburban - 7938">Suburban - 7938</option>
-                        </optgroup>
-
-                        <optgroup label="MERCEDES-BENZ">
-                            <option value="Sprinter - 6689">Sprinter - 6689</option>
+                            <option value="Sub-0663">Suburban - 0663</option>
+                            <option value="Sub-7149">Suburban - 7149</option>
                         </optgroup>
                     </select>
                 </div>
@@ -70,42 +70,53 @@
                 <div id="extraFields" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs uppercase mb-1 opacity-70">Villa / Miembro</label>
-                            <input type="text" name="villa" class="w-full p-3 rounded gold-border outline-none">
+                            <label class="block text-[10px] uppercase mb-1 opacity-60">Villa / Miembro</label>
+                            <input type="text" name="villa" class="w-full p-3 rounded-xl">
                         </div>
                         <div>
-                            <label class="block text-xs uppercase mb-1 opacity-70">Pax</label>
-                            <input type="number" name="pasajeros" class="w-full p-3 rounded gold-border outline-none">
+                            <label class="block text-[10px] uppercase mb-1 opacity-60">Pasajeros</label>
+                            <input type="number" name="pasajeros" class="w-full p-3 rounded-xl">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase mb-1 opacity-70">Destino</label>
-                        <input type="text" name="destino" class="w-full p-3 rounded gold-border outline-none">
+                        <label class="block text-[10px] uppercase mb-1 opacity-60">Destino</label>
+                        <input type="text" name="destino" class="w-full p-3 rounded-xl">
                     </div>
                 </div>
 
                 <div>
-                    <label id="kmLabel" class="block text-xs uppercase mb-1 opacity-70 font-bold gold-text">Kilometraje Inicial</label>
-                    <input type="number" name="km_actual" id="km" required class="w-full p-3 rounded gold-border outline-none text-xl font-bold" placeholder="0">
+                    <label id="kmLabel" class="block text-[10px] uppercase mb-1 gold-text font-bold">Kilometraje Inicial</label>
+                    <input type="number" name="km_actual" id="km" required class="w-full p-4 rounded-xl text-2xl font-bold text-center" placeholder="00000">
                 </div>
 
-                <button type="button" onclick="obtenerGPSYEnviar()" id="btnSubmit" class="w-full p-4 gold-bg font-bold rounded-xl mt-4 uppercase tracking-widest">
+                <button type="button" onclick="validarYEnviar()" id="btnSubmit" class="w-full p-5 gold-bg font-black rounded-2xl mt-4 uppercase tracking-[0.2em] shadow-xl">
                     Registrar Salida
                 </button>
             </form>
         </div>
 
-        <div id="successPanel" class="hidden glass p-8 rounded-2xl shadow-2xl text-center border-2 border-green-500">
-            <div class="text-6xl mb-4">✅</div>
+        <div id="successPanel" class="hidden glass p-10 rounded-2xl text-center border-2 border-green-500/50">
+            <div class="text-7xl mb-4">✅</div>
             <h2 class="text-2xl font-bold mb-2">SINCRO EXITOSA</h2>
-            <p id="successMsg" class="opacity-80 mb-8">Notificación enviada a Directores y CECOM.</p>
+            <p class="opacity-60 mb-8 text-sm">Datos enviados a Seguridad y Operaciones.</p>
             <button onclick="location.reload()" class="w-full p-4 gold-bg font-bold rounded-xl">NUEVO REGISTRO</button>
         </div>
     </div>
 
     <script>
-        // ENLACE ACTUALIZADO PROPORCIONADO POR SR. SOLANA
-        const API_URL = "https://script.google.com/macros/s/AKfycbw2NZslPgJyd6Z9cm1Wq2Mzc-4r0V-kaZu5_lqg9iIuuh14Za6UEJNmBwy5bSqz0WeUpQ/exec";
+        // URL del Backend (Vincular con Google Apps Script)
+        const API_URL = "TU_URL_DE_APPS_SCRIPT_AQUI";
+
+        function checkAccess() {
+            const pin = document.getElementById('accessPin').value;
+            if(pin === "1234") { // Cambiar por el PIN real deseado
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                document.getElementById('driverHidden').value = "Driver Autorizado";
+            } else {
+                alert("PIN INCORRECTO");
+            }
+        }
 
         function switchTab(type) {
             const isSalida = type === 'salida';
@@ -113,58 +124,60 @@
             document.getElementById('tab1').className = isSalida ? 'flex-1 p-3 cursor-pointer tab-active' : 'flex-1 p-3 cursor-pointer opacity-50';
             document.getElementById('tab2').className = !isSalida ? 'flex-1 p-3 cursor-pointer tab-active' : 'flex-1 p-3 cursor-pointer opacity-50';
             document.getElementById('extraFields').style.display = isSalida ? 'block' : 'none';
-            document.getElementById('sectionConductor').style.display = isSalida ? 'block' : 'none';
             document.getElementById('kmLabel').innerText = isSalida ? 'Kilometraje Inicial' : 'Kilometraje Final';
             document.getElementById('btnSubmit').innerText = isSalida ? 'Registrar Salida' : 'Registrar Entrada';
         }
 
-        function obtenerGPSYEnviar() {
+        function validarYEnviar() {
             const btn = document.getElementById('btnSubmit');
-            btn.disabled = true;
-            btn.innerText = "CAPTURANDO GPS...";
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        document.getElementById('latitud').value = position.coords.latitude;
-                        document.getElementById('longitud').value = position.coords.longitude;
-                        enviar();
-                    },
-                    (error) => {
-                        console.error(error);
-                        alert("Sr. Solana, el driver debe permitir el acceso al GPS para continuar.");
-                        btn.disabled = false;
-                        btn.innerText = "Reintentar Registro";
-                    },
-                    { enableHighAccuracy: true }
-                );
-            } else {
-                alert("GPS no soportado en este equipo.");
-                enviar();
-            }
-        }
-
-        function enviar() {
             const vehicle = document.getElementById('vehicle').value;
             const km = document.getElementById('km').value;
-            
-            if (!vehicle || !km) {
-                alert("Por favor, complete los datos de unidad y kilometraje.");
-                document.getElementById('btnSubmit').disabled = false;
-                document.getElementById('btnSubmit').innerText = "Reintentar";
+
+            if(!vehicle || !km) {
+                alert("Por favor complete Unidad y Kilometraje.");
                 return;
             }
 
-            const formData = new URLSearchParams(new FormData(document.getElementById('logisticsForm')));
+            btn.disabled = true;
+            btn.innerText = "CAPTURANDO GPS...";
 
-            fetch(API_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: formData
-            }).then(() => {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    document.getElementById('lat').value = pos.coords.latitude;
+                    document.getElementById('lng').value = pos.coords.longitude;
+                    enviarDatos();
+                },
+                (err) => {
+                    alert("Error: Se requiere GPS para validar el registro.");
+                    btn.disabled = false;
+                    btn.innerText = "REINTENTAR";
+                },
+                { enableHighAccuracy: true }
+            );
+        }
+
+        async function enviarDatos() {
+            const btn = document.getElementById('btnSubmit');
+            btn.innerText = "SINCRONIZANDO...";
+
+            const form = document.getElementById('logisticsForm');
+            const formData = new URLSearchParams(new FormData(form));
+
+            try {
+                // Usamos mode: 'no-cors' para Google Apps Script
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: formData
+                });
+                
                 document.getElementById('formPanel').classList.add('hidden');
                 document.getElementById('successPanel').classList.remove('hidden');
-            });
+            } catch (error) {
+                alert("Error de conexión. Intente de nuevo.");
+                btn.disabled = false;
+                btn.innerText = "REINTENTAR ENVÍO";
+            }
         }
     </script>
 </body>
