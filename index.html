@@ -54,8 +54,8 @@
         </header>
 
         <div class="flex mb-8 text-center border-b border-white/5">
-            <div id="tab1" onclick="switchTab('salida')" class="flex-1 p-4 cursor-pointer tab-active opacity-40 transition-all">CHECK-OUT</div>
-            <div id="tab2" onclick="switchTab('entrada')" class="flex-1 p-4 cursor-pointer opacity-40 transition-all">CHECK-IN</div>
+            <div id="tab1" onclick="switchTab('salida')" class="flex-1 p-4 cursor-pointer tab-active opacity-40 transition-all text-xs tracking-widest">CHECK-OUT</div>
+            <div id="tab2" onclick="switchTab('entrada')" class="flex-1 p-4 cursor-pointer opacity-40 transition-all text-xs tracking-widest">CHECK-IN</div>
         </div>
 
         <div id="formPanel" class="glass p-8 rounded-[2rem] shadow-2xl relative overflow-hidden">
@@ -71,12 +71,27 @@
                     <label class="block text-[10px] uppercase mb-2 opacity-50 font-black tracking-widest gold-text">Fleet Asset (Unit)</label>
                     <select name="unidad" id="vehicle" required class="w-full p-5 rounded-2xl gold-border appearance-none cursor-pointer">
                         <option value="" disabled selected>Select Unit...</option>
-                        <optgroup label="LUXURY SUVS">
-                            <option value="Tahoe-6785">Tahoe - 6785</option>
-                            <option value="Tahoe-0255">Tahoe - 0255</option>
-                            <option value="Tahoe-1702">Tahoe - 1702</option>
-                            <option value="Sub-0663">Suburban - 0663</option>
-                            <option value="Sub-7149">Suburban - 7149</option>
+                        
+                        <optgroup label="PREMIUM SUVS (TAHOE)">
+                            <option value="Tahoe-1030">Tahoe - 1030</option>
+                            <option value="Tahoe-1031">Tahoe - 1031</option>
+                            <option value="Tahoe-1032">Tahoe - 1032</option>
+                            <option value="Tahoe-1033">Tahoe - 1033</option>
+                            <option value="Tahoe-1034">Tahoe - 1034</option>
+                            <option value="Tahoe-1035">Tahoe - 1035</option>
+                        </optgroup>
+
+                        <optgroup label="EXECUTIVE SUVS (SUBURBAN)">
+                            <option value="Suburban-1130">Suburban - 1130</option>
+                            <option value="Suburban-1131">Suburban - 1131</option>
+                            <option value="Suburban-1132">Suburban - 1132</option>
+                            <option value="Suburban-1133">Suburban - 1133</option>
+                            <option value="Suburban-1134">Suburban - 1134</option>
+                            <option value="Suburban-1135">Suburban - 1135</option>
+                        </optgroup>
+
+                        <optgroup label="SPECIALIZED TRANSPORT">
+                            <option value="Sprinter-6987">Mercedes-Benz Sprinter - 6987</option>
                         </optgroup>
                     </select>
                 </div>
@@ -120,15 +135,10 @@
     </div>
 
     <script>
-        /**
-         * CONFIGURACIÓN CORPORATIVA
-         * El equipo de IT de Discovery Land debe configurar el endpoint de producción aquí:
-         */
         const API_URL = "https://script.google.com/macros/s/AKfycbzKKT9mMploGu-PzDGgJu2W4qqkBhnT1CXZ0z6CcFLOob2vPbof-ppgKCKqu7rTQ9ON/exec";
 
         function checkAccess() {
             const pin = document.getElementById('accessPin').value;
-            // PIN Maestro (Configurable por Seguridad del Club)
             if(pin === "1234") { 
                 document.getElementById('loginSection').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
@@ -184,7 +194,6 @@
             const formData = new URLSearchParams(new FormData(form));
 
             try {
-                // El backend de Google Apps Script procesa la petición de forma asíncrona
                 await fetch(API_URL, {
                     method: 'POST',
                     mode: 'no-cors',
